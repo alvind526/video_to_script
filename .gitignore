@@ -1,0 +1,19 @@
+# Byte-compiled / caches
+__pycache__/
+*.py[cod]
+
+# Desktop app build output
+build/
+dist/
+*.spec.bak
+*.zip
+
+# Old Hugging Face hub cache layout (app uses models/<size>/ instead)
+models/models--*/
+models/.locks/
+models/CACHEDIR.TAG
+
+# Keep downloaded model binaries out of git (re-fetch with download_model.py)
+models/*/model.bin
+models/*/tokenizer.json
+models/*/vocabulary.txt
