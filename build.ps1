@@ -1,17 +1,27 @@
 # Build a self-contained portable desktop app (model + icon embedded).
+# Prefers the project .venv. Run setup.ps1 first if needed.
 # Usage:
 #   powershell -ExecutionPolicy Bypass -File .\build.ps1
 
 $ErrorActionPreference = "Stop"
 Set-Location $PSScriptRoot
 
+$venvPython = Join-Path $PSScriptRoot ".venv\Scripts\python.exe"
+if (Test-Path $venvPython) {
+    $py = $venvPython
+    Write-Host "==> Using .venv Python" -ForegroundColor Cyan
+} else {
+    $py = "python"
+    Write-Host "==> No .venv — using system Python (prefer: setup.ps1)" -ForegroundColor Yellow
+}
+
 Write-Host "==> Ensuring build dependencies..." -ForegroundColor Cyan
-python -m pip install -r requirements.txt -r requirements-build.txt
-python -m pip install pillow -q
+& $py -m pip install -r requirements.txt -r requirements-build.txt
+& $py -m pip install pillow -q
 
 if (-not (Test-Path "models\base\model.bin")) {
     Write-Host "==> Speech model missing - downloading base (needs internet once)..." -ForegroundColor Yellow
-    python download_model.py base
+    & $py download_model.py base
 }
 
 if (-not (Test-Path "assets\app.ico")) {
@@ -23,7 +33,7 @@ Remove-Item -Recurse -Force -ErrorAction SilentlyContinue build, dist\VideoToScr
 Remove-Item -Force -ErrorAction SilentlyContinue dist\VideoToScript-Portable.zip
 
 Write-Host "==> Running PyInstaller (embeds model + icon)..." -ForegroundColor Cyan
-python -m PyInstaller --noconfirm VideoToScript.spec
+& $py -m PyInstaller --noconfirm VideoToScript.spec
 if ($LASTEXITCODE -ne 0) {
     throw "PyInstaller failed with exit code $LASTEXITCODE"
 }
